@@ -9,14 +9,15 @@
 #define UNUSED(x) (void)(x)
 
 int data = 0xABBACADA;
+int test;
 
 int main (void)
 {
-    int i, test, dummy;
+    int i, dummy = 0;
     unsigned long long mc_count0, mc_count1;
     unsigned long long mc[2];
 
-    if (metal_dcache_l1_available(metal_cpu_get_current_hartid()) == 0) {
+    if (!metal_dcache_l1_available()) {
         // abort since hardware dont support it
         return 0;
     }
@@ -30,12 +31,11 @@ int main (void)
         metal_timer_get_cyclecount(metal_cpu_get_current_hartid(), &mc_count1);
 
         // Use cflush (Data) L1
-        metal_dcache_l1_flush(metal_cpu_get_current_hartid(), (uintptr_t)NULL);
-        metal_dcache_l1_flush(metal_cpu_get_current_hartid(), (uintptr_t)&dummy);
+        metal_dcache_l1_flush((uintptr_t)NULL);
+        metal_dcache_l1_flush((uintptr_t)&dummy);
 
         // Use cdiscard (Data) L1
-        metal_dcache_l1_discard(metal_cpu_get_current_hartid(), (uintptr_t)NULL);
-        metal_dcache_l1_discard(metal_cpu_get_current_hartid(), (uintptr_t)&test);
+        metal_dcache_l1_discard((uintptr_t)&test);
 
         mc[i] = mc_count1 - mc_count0;
     }
